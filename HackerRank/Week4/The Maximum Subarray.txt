@@ -1,0 +1,50 @@
+#include <stdio.h>
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+int main() {
+    int t;
+    scanf("%d", &t);
+
+    while (t--) {
+        int n;
+        scanf("%d", &n);
+
+        int arr[n];
+        for (int i = 0; i < n; i++) {
+            scanf("%d", &arr[i]);
+        }
+
+        // ---------- Maximum Subarray (Kadane's Algorithm) ----------
+        int current_sum = arr[0];
+        int max_sum = arr[0];
+        for (int i = 1; i < n; i++) {
+            current_sum = max(arr[i], current_sum + arr[i]);
+            max_sum = max(max_sum, current_sum);
+        }
+
+        // ---------- Maximum Subsequence ----------
+        int subseq_sum = 0;
+        int has_positive = 0;
+        int max_element = arr[0];
+
+        for (int i = 0; i < n; i++) {
+            if (arr[i] > 0) {
+                subseq_sum += arr[i];
+                has_positive = 1;
+            }
+            if (arr[i] > max_element) {
+                max_element = arr[i];
+            }
+        }
+
+        if (!has_positive) {
+            subseq_sum = max_element;  // All numbers negative
+        }
+
+        printf("%d %d\n", max_sum, subseq_sum);
+    }
+    return 0;
+}
