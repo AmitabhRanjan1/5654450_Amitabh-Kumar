@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// comparator for qsort
+int cmpfunc(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
+
+int main() {
+    int n, k;
+    scanf("%d %d", &n, &k);
+
+    int houses[n];
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &houses[i]);
+    }
+
+    // sort the positions
+    qsort(houses, n, sizeof(int), cmpfunc);
+
+    int count = 0;
+    int i = 0;
+
+    while (i < n) {
+        count++;
+
+        // Step 1: find the furthest house within k from houses[i]
+        int loc = houses[i] + k;
+        while (i < n && houses[i] <= loc) {
+            i++;
+        }
+
+        // Step 2: place transmitter at the furthest valid house
+        int transmitter = houses[i - 1];
+
+        // Step 3: skip all houses covered by this transmitter
+        loc = transmitter + k;
+        while (i < n && houses[i] <= loc) {
+            i++;
+        }
+    }
+
+    printf("%d\n", count);
+    return 0;
+}
