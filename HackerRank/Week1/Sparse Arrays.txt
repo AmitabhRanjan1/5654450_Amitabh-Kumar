@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int cmpstr(const void* a, const void* b) {
+    return strcmp(*(char**)a, *(char**)b);
+}
+
+int count_occurrences(char* arr[], int n, const char* key) {
+    char** low = (char**)bsearch(&key, arr, n, sizeof(char*), cmpstr);
+    if (!low) return 0;
+
+    int count = 0;
+    // Count duplicates around the found position
+    for (char** p = low; p >= arr && strcmp(*p, key) == 0; --p) count++;
+    for (char** p = low + 1; p < arr + n && strcmp(*p, key) == 0; ++p) count++;
+    return count;
+}
+
+int main() {
+    int n, q;
+    scanf("%d", &n);
+    char** strings = malloc(n * sizeof(char*));
+    for (int i = 0; i < n; i++) {
+        strings[i] = malloc(256);
+        scanf("%s", strings[i]);
+    }
+
+    qsort(strings, n, sizeof(char*), cmpstr);
+
+    scanf("%d", &q);
+    char query[256];
+    while (q--) {
+        scanf("%s", query);
+        printf("%d\n", count_occurrences(strings, n, query));
+    }
+
+    // Cleanup omitted for brevity
+    return 0;
+}
