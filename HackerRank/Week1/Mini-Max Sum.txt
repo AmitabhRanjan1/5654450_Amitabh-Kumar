@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h> // For qsort
+
+// Comparison function for qsort
+int compare(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
+
+void miniMaxSum(int arr_count, int* arr) {
+    // Sort the array in ascending order
+    qsort(arr, arr_count, sizeof(int), compare);
+
+    long long min_sum = 0;
+    long long max_sum = 0;
+
+    // Calculate the minimum sum by summing the first four elements
+    for (int i = 0; i < 4; i++) {
+        min_sum += arr[i];
+    }
+
+    // Calculate the maximum sum by summing the last four elements
+    for (int i = arr_count - 4; i < arr_count; i++) {
+        max_sum += arr[i];
+    }
+
+    printf("%lld %lld\n", min_sum, max_sum);
+}
+
+int main() {
+    int arr[5];
+    for (int i = 0; i < 5; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    miniMaxSum(5, arr);
+
+    return 0;
+}
+
