@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    long long n;
+    scanf("%lld", &n);
+
+    int zeroBits = 0;
+    long long temp = n;
+
+    while (temp > 0) {
+        if ((temp & 1) == 0) {  // check last bit
+            zeroBits++;
+        }
+        temp >>= 1;  // shift right
+    }
+
+    // 2^zeroBits
+    long long result = 1LL << zeroBits;
+
+    printf("%lld\n", result);
+    return 0;
+}
