@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAXN 100000
+
+/* Generate first q primes using simple sieve */
+void generate_primes(int primes[], int q) {
+    int count = 0, num = 2;
+    while (count < q) {
+        int isPrime = 1;
+        for (int i = 2; i * i <= num; i++) {
+            if (num % i == 0) { isPrime = 0; break; }
+        }
+        if (isPrime) {
+            primes[count++] = num;
+        }
+        num++;
+    }
+}
+
+/* Simple stack structure */
+typedef struct {
+    int arr[MAXN];
+    int top;
+} Stack;
+
+void init(Stack* s) { s->top = -1; }
+int empty(Stack* s) { return s->top == -1; }
+void push(Stack* s, int x) { s->arr[++s->top] = x; }
+int pop(Stack* s) { return s->arr[s->top--]; }
+int peek(Stack* s) { return s->arr[s->top]; }
+
+int main() {
+    int n, q;
+    scanf("%d %d", &n, &q);
+
+    int numbers[MAXN];
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &numbers[i]);
+    }
+
+    /* Generate first q primes */
+    int primes[q];
+    generate_primes(primes, q);
+
+    /* Initial stack A0 */
+    Stack Acur, Anext, B;
+    init(&Acur);
+    for (int i = 0; i < n; i++) {
+        push(&Acur, numbers[i]);
+    }
+
+    for (int i = 0; i < q; i++) {
+        init(&Anext);
+        init(&B);
+
+        int p = primes[i];
+        /* Process current Acur stack (top to bottom) */
+        while (!empty(&Acur)) {
+            int val = pop(&Acur);
+            if (val % p == 0) {
+                push(&B, val);
+            } else {
+                push(&Anext, val);
+            }
+        }
+
+        /* Print B stack (top to bottom) */
+        while (!empty(&B)) {
+            printf("%d\n", pop(&B));
+        }
+
+        /* Prepare Acur for next iteration */
+        Acur = Anext;
+    }
+
+    /* Print remaining plates in last A */
+    while (!empty(&Acur)) {
+        printf("%d\n", pop(&Acur));
+    }
+
+    return 0;
+}
