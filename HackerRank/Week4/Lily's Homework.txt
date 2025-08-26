@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/* Function to swap two integers */
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+/* Structure to store value and original index */
+typedef struct {
+    int value;
+    int index;
+} Pair;
+
+/* Comparator for ascending sort */
+int cmpAsc(const void *a, const void *b) {
+    Pair *p1 = (Pair *)a;
+    Pair *p2 = (Pair *)b;
+    if (p1->value == p2->value) return p1->index - p2->index;
+    return p1->value - p2->value;
+}
+
+/* Comparator for descending sort */
+int cmpDesc(const void *a, const void *b) {
+    Pair *p1 = (Pair *)a;
+    Pair *p2 = (Pair *)b;
+    if (p1->value == p2->value) return p1->index - p2->index;
+    return p2->value - p1->value;
+}
+
+/* Function to count swaps to match sorted order */
+int countSwaps(Pair arr[], int n) {
+    int *visited = (int *)calloc(n, sizeof(int));
+    int swaps = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (visited[i] || arr[i].index == i) {
+            continue;
+        }
+
+        int cycle_size = 0;
+        int j = i;
+        while (!visited[j]) {
+            visited[j] = 1;
+            j = arr[j].index;
+            cycle_size++;
+        }
+        if (cycle_size > 1) {
+            swaps += (cycle_size - 1);
+        }
+    }
+
+    free(visited);
+    return swaps;
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    int *arr = (int *)malloc(n * sizeof(int));
+    Pair *pairs = (Pair *)malloc(n * sizeof(Pair));
+    Pair *pairs2 = (Pair *)malloc(n * sizeof(Pair));
+
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+        pairs[i].value = arr[i];
+        pairs[i].index = i;
+        pairs2[i] = pairs[i];
+    }
+
+    /* Sort ascending */
+    qsort(pairs, n, sizeof(Pair), cmpAsc);
+    for (int i = 0; i < n; i++) {
+        pairs[i].index = pairs[i].index;
+    }
+    int ascSwaps = countSwaps(pairs, n);
+
+    /* Sort descending */
+    qsort(pairs2, n, sizeof(Pair), cmpDesc);
+    for (int i = 0; i < n; i++) {
+        pairs2[i].index = pairs2[i].index;
+    }
+    int descSwaps = countSwaps(pairs2, n);
+
+    int result = (ascSwaps < descSwaps) ? ascSwaps : descSwaps;
+    printf("%d\n", result);
+
+    free(arr);
+    free(pairs);
+    free(pairs2);
+
+    return 0;
+}
