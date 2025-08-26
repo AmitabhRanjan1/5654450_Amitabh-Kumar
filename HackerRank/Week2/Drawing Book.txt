@@ -1,0 +1,14 @@
+#include <stdio.h>
+
+int main() {
+    int n, p;
+    scanf("%d %d", &n, &p);
+
+    int from_front = p / 2;
+    int from_back = (n / 2) - (p / 2);
+
+    int result = (from_front < from_back) ? from_front : from_back;
+
+    printf("%d\n", result);
+    return 0;
+}
