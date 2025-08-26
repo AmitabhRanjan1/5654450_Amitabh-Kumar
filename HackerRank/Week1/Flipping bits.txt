@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+int main() {
+    int q; // number of queries
+    scanf("%d", &q);
+
+    while (q--) {
+        unsigned int n;
+        scanf("%u", &n);
+
+        unsigned int flipped = ~n;           // flip all bits
+        flipped = flipped & 0xFFFFFFFF;      // ensure 32-bit mask
+        printf("%u\n", flipped);
+    }
+
+    return 0;
+}
