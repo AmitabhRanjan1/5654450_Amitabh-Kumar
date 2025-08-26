@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Check if a number is power of 2
+bool isPowerOfTwo(unsigned long long n) {
+    return (n && !(n & (n - 1)));
+}
+
+// Find largest power of 2 less than n
+unsigned long long highestPowerOfTwo(unsigned long long n) {
+    unsigned long long p = 1;
+    while (p << 1 <= n) {
+        p <<= 1;
+    }
+    return p;
+}
+
+int main() {
+    int t;
+    scanf("%d", &t);
+    while (t--) {
+        unsigned long long n;
+        scanf("%llu", &n);
+
+        int moves = 0;
+
+        while (n > 1) {
+            if (isPowerOfTwo(n)) {
+                n /= 2;
+            } else {
+                n -= highestPowerOfTwo(n);
+            }
+            moves++;
+        }
+
+        if (moves % 2 == 1)
+            printf("Louise\n");
+        else
+            printf("Richard\n");
+    }
+    return 0;
+}
