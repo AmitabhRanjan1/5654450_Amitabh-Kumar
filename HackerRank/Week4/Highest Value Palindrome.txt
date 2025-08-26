@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main() {
+    int n, k;
+    scanf("%d %d", &n, &k);
+
+    char s[100005];
+    scanf("%s", s);
+
+    int changes[100005] = {0}; /* track which positions were changed */
+    int left = 0, right = n - 1;
+    int used = 0;
+
+    /* First pass: make it a palindrome with minimum changes */
+    while (left < right) {
+        if (s[left] != s[right]) {
+            char maxChar = (s[left] > s[right]) ? s[left] : s[right];
+            s[left] = s[right] = maxChar;
+            changes[left] = changes[right] = 1;
+            used++;
+        }
+        left++;
+        right--;
+    }
+
+    if (used > k) {
+        printf("-1\n");
+        return 0;
+    }
+
+    int extra = k - used;
+    left = 0;
+    right = n - 1;
+
+    /* Second pass: maximize the palindrome value */
+    while (left <= right) {
+        if (left == right) {
+            if (extra > 0 && s[left] != '9') {
+                s[left] = '9';
+            }
+        } else {
+            if (s[left] != '9') {
+                if (changes[left] && extra > 0) {
+                    s[left] = s[right] = '9';
+                    extra--;
+                } else if (!changes[left] && extra > 1) {
+                    s[left] = s[right] = '9';
+                    extra -= 2;
+                }
+            }
+        }
+        left++;
+        right--;
+    }
+
+    printf("%s\n", s);
+    return 0;
+}
