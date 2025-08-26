@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAX 1000000  // increased size for safety
+
+int heap[MAX];
+int heapSize = 0;
+
+// Swap
+void swap(int *a, int *b) {
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+// Heapify Up
+void heapifyUp(int idx) {
+    while (idx > 0) {
+        int parent = (idx - 1) / 2;
+        if (heap[parent] > heap[idx]) {
+            swap(&heap[parent], &heap[idx]);
+            idx = parent;
+        } else break;
+    }
+}
+
+// Heapify Down
+void heapifyDown(int idx) {
+    while (1) {
+        int left = 2 * idx + 1;
+        int right = 2 * idx + 2;
+        int smallest = idx;
+
+        if (left < heapSize && heap[left] < heap[smallest]) smallest = left;
+        if (right < heapSize && heap[right] < heap[smallest]) smallest = right;
+
+        if (smallest != idx) {
+            swap(&heap[idx], &heap[smallest]);
+            idx = smallest;
+        } else break;
+    }
+}
+
+// Insert into heap
+void insert(int val) {
+    if (heapSize >= MAX) return;  // avoid overflow
+    heap[heapSize] = val;
+    heapifyUp(heapSize);
+    heapSize++;
+}
+
+// Extract min
+int extractMin() {
+    if (heapSize <= 0) return INT_MAX;  // safeguard
+    int minVal = heap[0];
+    heap[0] = heap[heapSize - 1];
+    heapSize--;
+    heapifyDown(0);
+    return minVal;
+}
+
+int main() {
+    int n, k;
+    if (scanf("%d %d", &n, &k) != 2) return 0;
+
+    for (int i = 0; i < n; i++) {
+        int val;
+        scanf("%d", &val);
+        insert(val);
+    }
+
+    int operations = 0;
+
+    while (heapSize > 0 && heap[0] < k) {
+        if (heapSize < 2) {  // not enough cookies left
+            printf("-1\n");
+            return 0;
+        }
+
+        int least1 = extractMin();
+        int least2 = extractMin();
+
+        long long new_cookie = (long long)least1 + 2LL * least2; // prevent overflow
+        insert((int)new_cookie);
+        operations++;
+    }
+
+    if (heapSize > 0)
+        printf("%d\n", operations);
+    else
+        printf("-1\n");
+
+    return 0;
+}
