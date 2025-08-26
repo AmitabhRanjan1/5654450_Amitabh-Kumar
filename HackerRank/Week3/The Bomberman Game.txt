@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+static void read_grid(char **g, int r, int c) {
+    for (int i = 0; i < r; i++) {
+        scanf("%s", g[i]);
+    }
+}
+
+static void print_grid(char **g, int r) {
+    for (int i = 0; i < r; i++) {
+        printf("%s\n", g[i]);
+    }
+}
+
+static char **alloc_grid(int r, int c) {
+    char **g = (char **)malloc(r * sizeof(char *));
+    for (int i = 0; i < r; i++) {
+        g[i] = (char *)malloc((c + 1) * sizeof(char));
+    }
+    return g;
+}
+
+static void free_grid(char **g, int r) {
+    for (int i = 0; i < r; i++) free(g[i]);
+    free(g);
+}
+
+/*
+ * explode(prev): returns grid after 3 seconds from 'prev'
+ * Algorithm:
+ *   1) Start with grid filled with bombs 'O'
+ *   2) For every bomb in prev, clear its cell and 4-neighbors in the new grid
+ */
+static char **explode(char **prev, int r, int c) {
+    char **next = alloc_grid(r, c);
+
+    // Step 1: fill with bombs
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) next[i][j] = 'O';
+        next[i][c] = '\0';
+    }
+
+    // Step 2: detonate bombs present in prev
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            if (prev[i][j] == 'O') {
+                next[i][j] = '.';
+                if (i > 0)       next[i-1][j] = '.';
+                if (i+1 < r)     next[i+1][j] = '.';
+                if (j > 0)       next[i][j-1] = '.';
+                if (j+1 < c)     next[i][j+1] = '.';
+            }
+        }
+    }
+    return next;
+}
+
+int main(void) {
+    int r, c;
+    long long n;
+    if (scanf("%d %d %lld", &r, &c, &n) != 3) return 0;
+
+    char **grid0 = alloc_grid(r, c);
+    read_grid(grid0, r, c);
+
+    // Case 1: t = 1
+    if (n == 1) {
+        print_grid(grid0, r);
+        free_grid(grid0, r);
+        return 0;
+    }
+
+    // Case 2: even seconds -> full bombs
+    if (n % 2 == 0) {
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) putchar('O');
+            putchar('\n');
+        }
+        free_grid(grid0, r);
+        return 0;
+    }
+
+    // Case 3: odd n >= 3 -> cycle of 4: t=3 pattern or t=5 pattern
+    char **grid3 = explode(grid0, r, c);     // state at t=3
+    char **grid5 = explode(grid3, r, c);     // state at t=5
+
+    if (n % 4 == 3) {
+        print_grid(grid3, r);
+    } else { // n % 4 == 1
+        print_grid(grid5, r);
+    }
+
+    free_grid(grid0, r);
+    free_grid(grid3, r);
+    free_grid(grid5, r);
+    return 0;
+}
