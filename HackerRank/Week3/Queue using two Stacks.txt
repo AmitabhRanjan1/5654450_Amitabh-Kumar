@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100000
+
+// Stack definition
+typedef struct {
+    int arr[MAX];
+    int top;
+} Stack;
+
+void init(Stack *s) { s->top = -1; }
+int empty(Stack *s) { return s->top == -1; }
+void push(Stack *s, int x) { s->arr[++s->top] = x; }
+int pop(Stack *s) { return s->arr[s->top--]; }
+int peek(Stack *s) { return s->arr[s->top]; }
+
+// Queue using 2 stacks
+Stack s1, s2;
+
+void enqueue(int x) {
+    push(&s1, x);
+}
+
+void shiftStacks() {
+    if (empty(&s2)) {
+        while (!empty(&s1)) {
+            push(&s2, pop(&s1));
+        }
+    }
+}
+
+void dequeue() {
+    shiftStacks();
+    if (!empty(&s2)) pop(&s2);
+}
+
+int front() {
+    shiftStacks();
+    return peek(&s2);
+}
+
+int main() {
+    init(&s1);
+    init(&s2);
+
+    int q, type, x;
+    scanf("%d", &q);
+
+    while (q--) {
+        scanf("%d", &type);
+        if (type == 1) {
+            scanf("%d", &x);
+            enqueue(x);
+        } else if (type == 2) {
+            dequeue();
+        } else if (type == 3) {
+            printf("%d\n", front());
+        }
+    }
+    return 0;
+}
