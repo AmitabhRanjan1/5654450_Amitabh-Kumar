@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAXN 1010
+
+typedef struct {
+    int x, y;
+    int dist;
+} Point;
+
+char grid[MAXN][MAXN];
+int visited[MAXN][MAXN];
+Point queue[MAXN * MAXN];
+int front, back;
+
+int n;
+
+int bfs(int sx, int sy, int gx, int gy) {
+    memset(visited, 0, sizeof(visited));
+    front = back = 0;
+
+    queue[back++] = (Point){sx, sy, 0};
+    visited[sx][sy] = 1;
+
+    while (front < back) {
+        Point p = queue[front++];
+
+        if (p.x == gx && p.y == gy) {
+            return p.dist;
+        }
+
+        // Move in all 4 directions until blocked or boundary
+        int dx[4] = {1, -1, 0, 0};
+        int dy[4] = {0, 0, 1, -1};
+
+        for (int dir = 0; dir < 4; dir++) {
+            int nx = p.x + dx[dir];
+            int ny = p.y + dy[dir];
+
+            while (nx >= 0 && nx < n && ny >= 0 && ny < n && grid[nx][ny] != 'X') {
+                if (!visited[nx][ny]) {
+                    visited[nx][ny] = 1;
+                    queue[back++] = (Point){nx, ny, p.dist + 1};
+                }
+                nx += dx[dir];
+                ny += dy[dir];
+            }
+        }
+    }
+    return -1; // Should not happen if input guarantees a path
+}
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        scanf("%s", grid[i]);
+    }
+
+    int sx, sy, gx, gy;
+    scanf("%d %d %d %d", &sx, &sy, &gx, &gy);
+
+    int ans = bfs(sx, sy, gx, gy);
+    printf("%d\n", ans);
+
+    return 0;
+}
