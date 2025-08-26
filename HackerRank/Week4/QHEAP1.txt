@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAX 100000
+
+int heap[MAX];
+int heapSize = 0;
+
+// Swap two elements
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Heapify up
+void heapifyUp(int idx) {
+    while (idx > 0) {
+        int parent = (idx - 1) / 2;
+        if (heap[parent] > heap[idx]) {
+            swap(&heap[parent], &heap[idx]);
+            idx = parent;
+        } else break;
+    }
+}
+
+// Heapify down
+void heapifyDown(int idx) {
+    int left, right, smallest;
+    while (1) {
+        left = 2 * idx + 1;
+        right = 2 * idx + 2;
+        smallest = idx;
+
+        if (left < heapSize && heap[left] < heap[smallest])
+            smallest = left;
+        if (right < heapSize && heap[right] < heap[smallest])
+            smallest = right;
+
+        if (smallest != idx) {
+            swap(&heap[idx], &heap[smallest]);
+            idx = smallest;
+        } else break;
+    }
+}
+
+// Insert value
+void insert(int val) {
+    heap[heapSize] = val;
+    heapifyUp(heapSize);
+    heapSize++;
+}
+
+// Delete value
+void deleteValue(int val) {
+    for (int i = 0; i < heapSize; i++) {
+        if (heap[i] == val) {
+            heap[i] = heap[heapSize - 1];
+            heapSize--;
+            heapifyDown(i);
+            heapifyUp(i);
+            break;
+        }
+    }
+}
+
+// Get min value
+int getMin() {
+    if (heapSize == 0) return INT_MAX;
+    return heap[0];
+}
+
+int main() {
+    int q;
+    scanf("%d", &q);
+
+    while (q--) {
+        int type, v;
+        scanf("%d", &type);
+
+        if (type == 1) {
+            scanf("%d", &v);
+            insert(v);
+        } else if (type == 2) {
+            scanf("%d", &v);
+            deleteValue(v);
+        } else if (type == 3) {
+            printf("%d\n", getMin());
+        }
+    }
+
+    return 0;
+}
