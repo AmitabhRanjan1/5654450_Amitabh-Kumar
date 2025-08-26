@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+char* timeConversion(char* s) {
+    int hh = (10 * (s[0] - '0')) + (s[1] - '0'); // Extract hour as integer
+
+    if (s[8] == 'P') { // If PM
+        if (hh < 12) { // If not 12 PM, add 12 to hour
+            hh += 12;
+        }
+    } else { // If AM
+        if (hh == 12) { // If 12 AM, convert to 00
+            hh = 0;
+        }
+    }
+
+    // Update the hour in the string
+    s[0] = (char)((hh / 10) + '0');
+    s[1] = (char)((hh % 10) + '0');
+
+    // Null-terminate the string before the AM/PM part
+    s[8] = '\0';
+
+    return s;
+}
+
+int main() {
+    char s[11]; // Allocate enough space for "HH:MM:SSAM" or "HH:MM:SSPM" and null terminator
+    scanf("%s", s);
+
+    char* result = timeConversion(s);
+    printf("%s\n", result);
+
+    return 0;
+}
