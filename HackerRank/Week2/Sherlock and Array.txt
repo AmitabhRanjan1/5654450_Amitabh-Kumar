@@ -1,0 +1,37 @@
+#include <stdio.h>
+
+int main() {
+    int T;
+    scanf("%d", &T);  // number of test cases
+    
+    while (T--) {
+        int n;
+        scanf("%d", &n);
+        int arr[n];
+        
+        long long totalSum = 0;
+        for (int i = 0; i < n; i++) {
+            scanf("%d", &arr[i]);
+            totalSum += arr[i];
+        }
+        
+        long long leftSum = 0;
+        int found = 0;
+        
+        for (int i = 0; i < n; i++) {
+            long long rightSum = totalSum - leftSum - arr[i];
+            if (leftSum == rightSum) {
+                found = 1;
+                break;
+            }
+            leftSum += arr[i];
+        }
+        
+        if (found)
+            printf("YES\n");
+        else
+            printf("NO\n");
+    }
+    
+    return 0;
+}
