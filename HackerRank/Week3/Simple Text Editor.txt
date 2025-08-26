@@ -1,0 +1,153 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Dynamic text buffer */
+typedef struct {
+    char *s;
+    int len;
+    int cap;
+} Text;
+
+void text_init(Text *t) {
+    t->cap = 16;
+    t->len = 0;
+    t->s = (char *)malloc(t->cap);
+    t->s[0] = '\0';
+}
+
+void ensure_cap(Text *t, int need) {
+    if (need <= t->cap) return;
+    while (t->cap < need) t->cap <<= 1;
+    t->s = (char *)realloc(t->s, t->cap);
+}
+
+void text_append(Text *t, const char *w, int wlen) {
+    ensure_cap(t, t->len + wlen + 1);
+    memcpy(t->s + t->len, w, wlen);
+    t->len += wlen;
+    t->s[t->len] = '\0';
+}
+
+void text_delete_last(Text *t, int k) {
+    if (k > t->len) k = t->len; /* safety */
+    t->len -= k;
+    t->s[t->len] = '\0';
+}
+
+/* Operation stack for undo */
+typedef struct {
+    int type;      /* 1=append, 2=delete */
+    int len;       /* length appended or deleted */
+    char *str;     /* for type=2, the deleted substring to restore on undo */
+} Op;
+
+typedef struct {
+    Op *a;
+    int top;
+    int cap;
+} Stack;
+
+void stack_init(Stack *st, int cap) {
+    st->cap = cap > 0 ? cap : 16;
+    st->top = 0;
+    st->a = (Op *)malloc(sizeof(Op) * st->cap);
+}
+
+void stack_push(Stack *st, Op op) {
+    if (st->top >= st->cap) {
+        st->cap <<= 1;
+        st->a = (Op *)realloc(st->a, sizeof(Op) * st->cap);
+    }
+    st->a[st->top++] = op;
+}
+
+int stack_empty(Stack *st) { return st->top == 0; }
+
+Op stack_pop(Stack *st) {
+    return st->a[--st->top];
+}
+
+int main(void) {
+    int Q;
+    if (scanf("%d", &Q) != 1) return 0;
+
+    Text txt;
+    text_init(&txt);
+
+    Stack st;
+    stack_init(&st, Q);
+
+    /* Buffer to read strings for op 1 */
+    /* Max single append on HackerRank fits in ~1e6; adjust generously */
+    char *buf = (char *)malloc(1000005);
+
+    for (int qi = 0; qi < Q; ++qi) {
+        int type;
+        if (scanf("%d", &type) != 1) type = 0;
+
+        if (type == 1) {
+            /* append W */
+            scanf("%s", buf);
+            int wlen = (int)strlen(buf);
+            text_append(&txt, buf, wlen);
+
+            Op op;
+            op.type = 1;
+            op.len = wlen;
+            op.str = NULL; /* not needed for undo */
+            stack_push(&st, op);
+        } else if (type == 2) {
+            /* delete k */
+            int k;
+            scanf("%d", &k);
+            if (k > txt.len) k = txt.len;
+
+            /* save deleted substring for undo */
+            Op op;
+            op.type = 2;
+            op.len = k;
+            op.str = (char *)malloc(k + 1);
+            memcpy(op.str, txt.s + (txt.len - k), k);
+            op.str[k] = '\0';
+
+            text_delete_last(&txt, k);
+            stack_push(&st, op);
+        } else if (type == 3) {
+            /* print k-th char (1-indexed) */
+            int k;
+            scanf("%d", &k);
+            if (k >= 1 && k <= txt.len) {
+                putchar(txt.s[k - 1]);
+                putchar('\n');
+            } else {
+                /* input guarantees valid k; guard just in case */
+                putchar('\n');
+            }
+        } else if (type == 4) {
+            /* undo */
+            if (!stack_empty(&st)) {
+                Op op = stack_pop(&st);
+                if (op.type == 1) {
+                    /* undo append: delete last op.len */
+                    text_delete_last(&txt, op.len);
+                } else if (op.type == 2) {
+                    /* undo delete: append saved string back */
+                    text_append(&txt, op.str, op.len);
+                    free(op.str);
+                }
+            }
+        } else {
+            /* ignore unknown types */
+        }
+    }
+
+    /* cleanup */
+    free(buf);
+    for (int i = 0; i < st.top; ++i) {
+        if (st.a[i].type == 2 && st.a[i].str) free(st.a[i].str);
+    }
+    free(st.a);
+    free(txt.s);
+    return 0;
+}
