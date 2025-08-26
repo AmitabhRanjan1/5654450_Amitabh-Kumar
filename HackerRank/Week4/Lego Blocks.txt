@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <math.h>
+
+#define MOD 1000000007
+#define MAX 1000
+
+long long modpow(long long base, long long exp) {
+    long long result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1) result = (result * base) % MOD;
+        base = (base * base) % MOD;
+        exp /= 2;
+    }
+    return result;
+}
+
+int main() {
+    int t;
+    scanf("%d", &t);
+
+    while (t--) {
+        int n, m;
+        scanf("%d %d", &n, &m);
+
+        long long row[MAX + 1] = {0};
+        long long total[MAX + 1] = {0};
+        long long solid[MAX + 1] = {0};
+
+        // Ways to build a single row
+        row[0] = 1;
+        for (int i = 1; i <= m; i++) {
+            row[i] = 0;
+            if (i >= 1) row[i] = (row[i] + row[i-1]) % MOD;
+            if (i >= 2) row[i] = (row[i] + row[i-2]) % MOD;
+            if (i >= 3) row[i] = (row[i] + row[i-3]) % MOD;
+            if (i >= 4) row[i] = (row[i] + row[i-4]) % MOD;
+        }
+
+        // Total ways (row[m]^n)
+        for (int i = 1; i <= m; i++) {
+            total[i] = modpow(row[i], n);
+        }
+
+        // Solid walls using inclusion-exclusion
+        solid[0] = 1;
+        for (int i = 1; i <= m; i++) {
+            solid[i] = total[i];
+            for (int j = 1; j < i; j++) {
+                solid[i] = (solid[i] - (solid[j] * total[i-j]) % MOD + MOD) % MOD;
+            }
+        }
+
+        printf("%lld\n", solid[m]);
+    }
+
+    return 0;
+}
