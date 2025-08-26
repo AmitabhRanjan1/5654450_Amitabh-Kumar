@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main() {
+    char s[100005];
+    scanf("%s", s);
+
+    int freq[26] = {0};
+    int len = strlen(s);
+
+    // Count frequency of each character
+    for (int i = 0; i < len; i++) {
+        freq[s[i] - 'a']++;
+    }
+
+    // Count frequencies of frequencies
+    int minFreq = 1e9, maxFreq = 0;
+    for (int i = 0; i < 26; i++) {
+        if (freq[i] > 0) {
+            if (freq[i] < minFreq) minFreq = freq[i];
+            if (freq[i] > maxFreq) maxFreq = freq[i];
+        }
+    }
+
+    int minCount = 0, maxCount = 0;
+    for (int i = 0; i < 26; i++) {
+        if (freq[i] == minFreq) minCount++;
+        if (freq[i] == maxFreq) maxCount++;
+    }
+
+    // Cases where string is valid
+    if (minFreq == maxFreq) {
+        printf("YES\n");  // all same frequency
+    } 
+    else if ( (minFreq == 1 && minCount == 1 && (maxFreq * maxCount + minFreq * minCount == len)) ) {
+        printf("YES\n");  // one char appears once
+    } 
+    else if ( (maxFreq == minFreq + 1 && maxCount == 1) ) {
+        printf("YES\n");  // one char exceeds others by 1
+    } 
+    else {
+        printf("NO\n");
+    }
+
+    return 0;
+}
