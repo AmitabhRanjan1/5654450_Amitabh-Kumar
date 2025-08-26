@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main() {
+    int n, k;
+    scanf("%d", &n);
+    
+    char str[101];
+    scanf("%s", str);
+    
+    scanf("%d", &k);
+    k = k % 26;  // normalize shift
+    
+    for (int i = 0; i < n; i++) {
+        if (isupper(str[i])) {
+            str[i] = 'A' + (str[i] - 'A' + k) % 26;
+        } else if (islower(str[i])) {
+            str[i] = 'a' + (str[i] - 'a' + k) % 26;
+        }
+        // else keep the same (digits/symbols)
+    }
+    
+    printf("%s\n", str);
+    return 0;
+}
