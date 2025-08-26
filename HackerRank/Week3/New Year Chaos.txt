@@ -1,0 +1,42 @@
+#include <stdio.h>
+
+int main() {
+    int t;
+    scanf("%d", &t);
+
+    while (t--) {
+        int n;
+        scanf("%d", &n);
+
+        int q[n+1];
+        for (int i = 1; i <= n; i++) {
+            scanf("%d", &q[i]);
+        }
+
+        int chaotic = 0;
+        long long bribes = 0;
+
+        for (int i = 1; i <= n; i++) {
+            // If person has moved more than 2 spots forward
+            if (q[i] - i > 2) {
+                chaotic = 1;
+                break;
+            }
+
+            // Count how many people overtook q[i]
+            for (int j = (q[i] - 2 > 1 ? q[i] - 2 : 1); j < i; j++) {
+                if (q[j] > q[i]) {
+                    bribes++;
+                }
+            }
+        }
+
+        if (chaotic) {
+            printf("Too chaotic\n");
+        } else {
+            printf("%lld\n", bribes);
+        }
+    }
+
+    return 0;
+}
