@@ -1,0 +1,13 @@
+void preOrder(struct node *root) {
+    if (root == NULL)
+        return;
+
+    // Print root data first (Preorder step)
+    printf("%d ", root->data);
+
+    // Traverse left subtree
+    preOrder(root->left);
+
+    // Traverse right subtree
+    preOrder(root->right);
+}
